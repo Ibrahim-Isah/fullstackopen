@@ -1,35 +1,93 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState } from 'react';
+
+const Header = (props) => {
+	return <h1>{props.name}</h1>;
+};
+
+const Button = (props) => {
+	return (
+		<button
+			onClick={props.onClick}
+			style={{
+				marginLeft: '20px',
+			}}
+		>
+			{props.text}
+		</button>
+	);
+};
+
+const StatisticLine = (props) => {
+	if (props.text === 'positive') {
+		return (
+			<tr>
+				<td>{props.text}</td>
+				<td>{props.value} %</td>
+			</tr>
+		);
+	}
+	return (
+		<tr>
+			<td>{props.text}</td>
+			<td>{props.value}</td>
+		</tr>
+	);
+};
+
+const Statistics = (props) => {
+	const all = props.good + props.neutral + props.bad;
+	const average = (props.good - props.bad) / all;
+	const positive = (props.good / all) * 100;
+
+	if (all === 0) {
+		return (
+			<div>
+				<p>No feedback given</p>
+			</div>
+		);
+	}
+
+	return (
+		<table>
+			<tbody>
+				<StatisticLine text='good' value={props.good} />
+				<StatisticLine text='neutral' value={props.neutral} />
+				<StatisticLine text='bad' value={props.bad} />
+				<StatisticLine text='all' value={all} />
+				<StatisticLine text='average' value={average} />
+				<StatisticLine text='positive' value={positive} />
+			</tbody>
+		</table>
+	);
+};
 
 function App() {
-  const [count, setCount] = useState(0)
+	const [good, setGood] = useState(0);
+	const [neutral, setNeutral] = useState(0);
+	const [bad, setBad] = useState(0);
 
-  return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+	const handleGoodClick = () => {
+		setGood(good + 1);
+	};
+
+	const handleNeutralClick = () => {
+		setNeutral(neutral + 1);
+	};
+
+	const handleBadClick = () => {
+		setBad(bad + 1);
+	};
+
+	return (
+		<>
+			<Header name='give feedback' />
+			<Button onClick={handleGoodClick} text='good' />
+			<Button onClick={handleNeutralClick} text='neutral' />
+			<Button onClick={handleBadClick} text='bad' />
+			<Header name='statistics' />
+			<Statistics good={good} neutral={neutral} bad={bad} />
+		</>
+	);
 }
 
-export default App
+export default App;
