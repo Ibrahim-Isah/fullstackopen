@@ -3,10 +3,10 @@ import axios from 'axios';
 import Country from './components/Country';
 
 function App() {
-	const [country, setCountry] = useState('');
 	const [countries, setCountries] = useState([]);
-	const [countriesFilter, setCountriesFilter] = useState([]);
 	const [showCountry, setShowCountry] = useState({});
+	const [country, setCountry] = useState('');
+	const [filterCountries, setFilterCountries] = useState([]);
 
 	useEffect(() => {
 		axios.get('https://restcountries.eu/rest/v2/all').then((response) => {
@@ -16,13 +16,13 @@ function App() {
 
 	useEffect(() => {
 		setShowCountry(
-			countriesFilter.length === 1 ? { ...countriesFilter[0] } : {}
+			filterCountries.length === 1 ? { ...filterCountries[0] } : {}
 		);
-	}, [countriesFilter]);
+	}, [filterCountries]);
 
 	const searchCountry = (e) => {
 		setCountry(e.target.value);
-		setCountriesFilter(
+		setFilterCountries(
 			countries.filter(
 				(country) =>
 					country.name.toLowerCase().search(e.target.value.toLowerCase()) !== -1
@@ -31,8 +31,8 @@ function App() {
 	};
 
 	const showCountries = () => {
-		if (countriesFilter.length <= 1) return;
-		return countriesFilter.map((country) => (
+		if (filterCountries.length <= 1) return;
+		return filterCountries.map((country) => (
 			<p key={country.name}>
 				{country.name}
 				<button onClick={() => setShowCountry(country)}>show</button>
@@ -46,7 +46,7 @@ function App() {
 				find countries{' '}
 				<input value={country} name='country' onChange={searchCountry} />
 			</p>
-			{countriesFilter.length > 10 ? (
+			{filterCountries.length > 10 ? (
 				<p>Too many matches, specify another filter</p>
 			) : (
 				showCountries()
