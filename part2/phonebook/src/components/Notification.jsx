@@ -10,7 +10,9 @@ const Notification = ({ message }) => {
 			<div
 				style={{
 					color: 'red',
-					border: '1px solid red',
+					background: 'lightgrey',
+					fontSize: '20px',
+					borderStyle: 'solid',
 					borderRadius: '5px',
 					padding: '10px',
 					marginBottom: '10px',
@@ -25,7 +27,9 @@ const Notification = ({ message }) => {
 			<div
 				style={{
 					color: 'green',
-					border: '1px solid green',
+					background: 'lightgrey',
+					fontSize: '20px',
+					borderStyle: 'solid',
 					borderRadius: '5px',
 					padding: '10px',
 					marginBottom: '10px',

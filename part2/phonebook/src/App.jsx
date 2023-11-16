@@ -7,11 +7,11 @@ import apiService from './services/api';
 
 const App = () => {
 	const [persons, setPersons] = useState([]);
-	const [allPersons, setAllPersons] = useState([]);
-	const [newName, setNewName] = useState('');
-	const [newNumber, setNewNumber] = useState('');
-	const [newFilter, setNewFilter] = useState('');
 	const [message, setMessage] = useState(null);
+	const [newNumber, setNewNumber] = useState('');
+	const [allPersons, setAllPersons] = useState([]);
+	const [newFilter, setNewFilter] = useState('');
+	const [newName, setNewName] = useState('');
 
 	useEffect(() => {
 		apiService.getAll().then((initialPersons) => {
@@ -35,12 +35,12 @@ const App = () => {
 				apiService
 					.update(updatedPerson.id, updatedPerson)
 					.then((returnedPerson) => {
-						console.log(`${returnedPerson.name} successfully updated`);
 						setAllPersons(
 							allPersons.map((personItem) =>
 								personItem.id !== personToAdd.id ? personItem : returnedPerson
 							)
 						);
+						console.log(`${returnedPerson.name} successfully updated`);
 						setNewName('');
 						setNewNumber('');
 						setMessage(`${updatedPerson.name} was successfully updated`);
