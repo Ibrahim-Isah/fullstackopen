@@ -1,0 +1,19 @@
+services:
+- type: web
+  name: phonebook
+  branch: main
+  runtime: static
+  buildCommand: cd part3/phonebook; yarn; yarn build
+  startCommand: cd part3/phonebook; yarn start
+  staticPublishPath: ./part3/dist/
+  # Build and deploy `phonebook` if any `js` file changes,
+  # but ignore any test files.
+  buildFilter:
+    paths:
+    - part0/**/*.js
+    - part1/**/*.js
+    - part2/**/*.js
+    ignoredPaths:
+    - part0/**/*.test.js
+    - part1/**/*.test.js
+    - part2/**/*.test.js
