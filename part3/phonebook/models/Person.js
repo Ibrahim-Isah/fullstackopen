@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 mongoose
 // eslint-disable-next-line no-undef
-  .connect(process.env.MONGODB_LOCAL)
+  .connect(process.env.MONGODB_URI)
   .then(() => {
     console.log('connected to MongoDB');
   })
