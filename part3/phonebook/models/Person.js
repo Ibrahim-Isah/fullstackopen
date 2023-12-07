@@ -21,6 +21,23 @@ const personSchema = new Schema({
   },
   number: {
     required: true,
+    validate: {
+      validator: function (v) {
+        const numberArray = v.split('-');
+
+        if (numberArray.length !== 2) {
+          return false;
+        } else if (
+          !numberArray[0] ||
+					numberArray[0].length > 3 ||
+					numberArray[0].length < 1 ||
+					!numberArray[1]
+        ) {
+          return false;
+        }
+      },
+      message: (props) => `${props.value} is not a valid phone number!`,
+    },
     type: String,
     min: 8,
   },
