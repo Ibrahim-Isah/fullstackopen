@@ -63,6 +63,23 @@ app.post('/api/persons', async (req, res, next) => {
     });
   }
 
+  const numberArray = person.number.split('-');
+
+  if (numberArray.length !== 2) {
+    return res.status(404).json({
+      error: 'Incorrect number format.',
+    });
+  } else if (
+    !numberArray[0] ||
+		numberArray[0].length > 3 ||
+		numberArray[0].length < 1 ||
+		!numberArray[1]
+  ) {
+    return res.status(404).json({
+      error: 'Incorrect number format.',
+    });
+  }
+
   const alreadyExists = await Person.findOne({
     name: person.name,
   });
@@ -92,6 +109,23 @@ app.put('/api/persons/:id', async (req, res, next) => {
     if (!personExists) {
       return res.status(400).send({
         error: 'Person with that id does not exists',
+      });
+    }
+
+    const numberArray = person.number.split('-');
+
+    if (numberArray.length !== 2) {
+      return res.status(404).json({
+        error: 'Incorrect number format.',
+      });
+    } else if (
+      !numberArray[0] ||
+			numberArray[0].length > 3 ||
+			numberArray[0].length < 1 ||
+			!numberArray[1]
+    ) {
+      return res.status(404).json({
+        error: 'Incorrect number format.',
       });
     }
 
