@@ -1,5 +1,3 @@
-const logger = require('./logger');
-
 const dummy = (blogs) => {
 	return 1;
 };
@@ -22,9 +20,6 @@ const mostLiked = (blogs) => {
 			maxLikes = blog.likes;
 		}
 	});
-
-	logger.info('most liked', mostLiked);
-	logger.info('maxLikes', maxLikes);
 
 	return mostLiked;
 };
