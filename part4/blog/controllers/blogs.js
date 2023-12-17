@@ -15,4 +15,25 @@ blogsRouter.post('/', async (request, response) => {
 	response.status(201).json(savedBlog);
 });
 
+blogsRouter.put('/:id', async (request, response) => {
+	const updatedBlog = {
+		...request.body,
+	};
+
+	const updated = await Blog.findByIdAndUpdate(request.params.id, updatedBlog, {
+		new: true,
+	});
+
+	response.status(200).json(updated);
+});
+
+blogsRouter.delete('/:id', async (request, response) => {
+	const blogExist = await Blog.findById(request.params.id);
+	if (blogExist) {
+		await Blog.findByIdAndDelete(request.params.id);
+	}
+
+	response.status(204).send({ success: true });
+});
+
 module.exports = blogsRouter;
