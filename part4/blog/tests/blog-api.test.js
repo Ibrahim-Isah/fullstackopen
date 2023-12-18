@@ -1,9 +1,15 @@
 const mongoose = require('mongoose');
 const app = require('../app');
 const supertest = require('supertest');
+const Blog = require('../models/Blog');
 const helper = require('./test-helper');
 
 const api = supertest(app);
+
+beforeEach(async () => {
+	await Blog.deleteMany({});
+	await Blog.insertMany(helper.initialBlogs);
+});
 
 describe('blogs post and render all works', () => {
 	test('blogs are returned', async () => {
