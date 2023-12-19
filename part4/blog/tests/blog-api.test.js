@@ -8,6 +8,7 @@ const api = supertest(app);
 
 beforeEach(async () => {
 	await Blog.deleteMany({});
+	await User.deleteMany({});
 	await Blog.insertMany(helper.initialBlogs);
 });
 
@@ -145,6 +146,28 @@ describe('change blogs on database', () => {
 		const randomWrongId = '2384rhjfnw23';
 
 		await api.put(`/api/blogs/${randomWrongId}`).send(someBlog).expect(404);
+	});
+});
+
+describe('user communication with database', () => {
+	test('should return error if username or password is missing', async () => {
+		const newUser = {
+			username: '',
+			password: 'password',
+			name: 'jane doe',
+		};
+
+		await api.post('/api/users').send(newUser).expect(404);
+	});
+
+	test('should return error if username or password length is less than 3', async () => {
+		const newUser = {
+			username: 'jane',
+			password: 'pa',
+			name: 'jane doe',
+		};
+
+		await api.post('/api/users').send(newUser).expect(404);
 	});
 });
 
