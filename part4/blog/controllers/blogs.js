@@ -7,6 +7,18 @@ blogsRouter.get('/', async (request, response) => {
 	response.json(blogs);
 });
 
+blogsRouter.get('/:id', async (request, response) => {
+	const blog = await Blog.findById(request.params.id);
+
+	if (!blog) {
+		return response.status(404).json({
+			error: 'Blog does not exists',
+		});
+	}
+
+	return response.json(blog);
+});
+
 blogsRouter.post('/', async (request, response) => {
 	const blog = new Blog(request.body);
 
@@ -27,6 +39,14 @@ blogsRouter.put('/:id', async (request, response) => {
 	const updatedBlog = {
 		...request.body,
 	};
+
+	const blogExist = await Blog.findById(request.params.id);
+
+	if (!blogExist) {
+		return response.status(404).json({
+			error: 'Blog does not exists',
+		});
+	}
 
 	const updated = await Blog.findByIdAndUpdate(request.params.id, updatedBlog, {
 		new: true,
