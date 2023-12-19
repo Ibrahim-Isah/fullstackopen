@@ -24,6 +24,8 @@ const errorHandler = (err, req, res, next) => {
 		return response.status(401).json({ error: error.message });
 	} else if (error.name === 'TokenExpiredError') {
 		return response.status(401).json({ error: 'token expired' });
+	} else if (error.name === 'ReferenceError') {
+		return response.status(404).json({ error: 'not found' });
 	}
 
 	next(err);

@@ -1,4 +1,4 @@
-export const getTokenFromRequest = (request) => {
+const getTokenFromRequest = (request) => {
 	const authorization = request.get(authorization);
 
 	if (authorization && authorization.startsWith('Bearer ')) {
@@ -6,4 +6,8 @@ export const getTokenFromRequest = (request) => {
 	}
 
 	return null;
+};
+
+module.exports = {
+	getTokenFromRequest,
 };
