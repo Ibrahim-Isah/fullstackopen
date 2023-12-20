@@ -3,14 +3,7 @@ const Blog = require('../models/Blog');
 const User = require('../models/User');
 const config = require('../utils/config');
 const jwt = require('jsonwebtoken');
-
-const getTokenFrom = (request) => {
-	const authorization = request.get('authorization');
-	if (authorization && authorization.startsWith('Bearer ')) {
-		return authorization.replace('Bearer ', '');
-	}
-	return null;
-};
+require('express-async-errors');
 
 blogsRouter.get('/', async (request, response) => {
 	const blogs = await Blog.find({}).populate('user', {
@@ -34,13 +27,7 @@ blogsRouter.get('/:id', async (request, response) => {
 });
 
 blogsRouter.post('/', async (request, response) => {
-	const decodedToken = await jwt.verify(getTokenFrom(request), config.SECRET);
-
-	if (!decodedToken) {
-		return response.status(401).json({ error: 'token invalid' });
-	}
-
-	const user = await User.findById(decodedToken.id);
+	const user = await User.findById(request.user);
 
 	const blog = new Blog({
 		...request.body,
@@ -84,11 +71,21 @@ blogsRouter.put('/:id', async (request, response) => {
 
 blogsRouter.delete('/:id', async (request, response) => {
 	const blogExist = await Blog.findById(request.params.id);
-	if (blogExist) {
-		await Blog.findByIdAndDelete(request.params.id);
+
+	if (!blogExist) {
+		return response.status(404).json({
+			error: 'Blog does not exists',
+		});
 	}
 
-	response.status(204).send({ success: true });
+	if (blogExist.user.toString() === request.user.toString()) {
+		await Blog.deleteOne({ _id: request.params.id });
+		return response.status(204).send({ success: true });
+	} else {
+		return response.status(401).json({
+			error: "You don't have permission to delete this blog",
+		});
+	}
 });
 
 module.exports = blogsRouter;
