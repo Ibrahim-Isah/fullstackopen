@@ -1,15 +1,40 @@
 const mongoose = require('mongoose');
+const jwt = require('jsonwebtoken');
+const config = require('../utils/config');
 const app = require('../app');
 const supertest = require('supertest');
-const Blog = require('../models/Blog');
+const bcrypt = require('bcrypt');
 const helper = require('./test-helper');
+const Blog = require('../models/Blog');
+const User = require('../models/User');
 
 const api = supertest(app);
+let token;
 
 beforeEach(async () => {
 	await Blog.deleteMany({});
 	await User.deleteMany({});
-	await Blog.insertMany(helper.initialBlogs);
+
+	const passwordHash = await bcrypt.hash('secret', 10);
+	const user = new User({
+		username: 'test',
+		name: 'test',
+		passwordHash,
+	});
+
+	const savedUser = await user.save();
+	const userForToken = {
+		username: savedUser.username,
+		id: savedUser.id,
+	};
+
+	token = jwt.sign(userForToken, config.SECRET, { expiresIn: 60 * 60 * 3 });
+
+	for (let blog of helper.initialBlogs) {
+		blog.user = savedUser._id;
+		let blogObject = new Blog(blog);
+		await blogObject.save();
+	}
 });
 
 describe('blogs post and render all works', () => {
@@ -38,6 +63,7 @@ describe('blogs post and render all works', () => {
 
 		await api
 			.post('/api/blogs')
+			.set('Authorization', `Bearer ${token}`)
 			.send(newBlog)
 			.expect(201)
 			.expect('Content-Type', /application\/json/);
@@ -55,7 +81,7 @@ describe('blogs post and render all works', () => {
 
 		await api
 			.post('/api/blogs')
-			// .set('Authorization', `bearer ${token}`)
+			.set('Authorization', `Bearer ${token}`)
 			.send(newBlogZeroLikes)
 			.expect(201);
 
@@ -74,7 +100,7 @@ describe('blogs post and render all works', () => {
 
 		await api
 			.post('/api/blogs')
-			// .set('Authorization', `bearer ${token}`)
+			.set('Authorization', `Bearer ${token}`)
 			.send(newBlogEmptyTitle)
 			.expect(400);
 
@@ -90,7 +116,7 @@ describe('blogs post and render all works', () => {
 
 		await api
 			.post('/api/blogs')
-			// .set('Authorization', `bearer ${token}`)
+			.set('Authorization', `Bearer ${token}`)
 			.send(newBlogEmptyUrl)
 			.expect(400);
 
@@ -106,7 +132,7 @@ describe('change blogs on database', () => {
 
 		await api
 			.delete(`/api/blogs/${someBlog.id}`)
-			// .set('Authorization', `bearer ${token}`)
+			.set('Authorization', `Bearer ${token}`)
 			.expect(204);
 
 		const updateBlogsInDb = await helper.blogsInDb();
