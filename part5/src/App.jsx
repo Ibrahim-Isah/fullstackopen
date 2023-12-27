@@ -10,6 +10,9 @@ const App = () => {
 	const [username, setUsername] = useState('');
 	const [password, setPassword] = useState('');
 	const [message, setMessage] = useState(null);
+	const [title, setTitle] = useState('');
+	const [url, setUrl] = useState('');
+	const [author, setAuthor] = useState('');
 
 	useEffect(() => {
 		blogService.getAll().then((blogs) => setBlogs(blogs));
@@ -39,10 +42,49 @@ const App = () => {
 		}
 	};
 
+	const newBlogForm = () => {
+		return (
+			<div>
+				<h2>create new blog</h2>
+				<form>
+					<div>
+						title
+						<input
+							name='title'
+							type='text'
+							value={title}
+							onChange={({ target }) => setTitle(target.value)}
+						/>
+					</div>
+					<div>
+						author
+						<input
+							name='author'
+							type='text'
+							value={author}
+							onChange={({ target }) => setAuthor(target.value)}
+						/>
+						<div>
+							url
+							<input
+								name='url'
+								type='text'
+								value={url}
+								onChange={({ target }) => setUrl(target.value)}
+							/>
+						</div>
+					</div>
+					<button type='submit'>Submit</button>
+				</form>
+			</div>
+		);
+	};
+
 	const blogList = () => {
 		return (
 			<div>
 				<h2>blogs</h2>
+				{newBlogForm()}
 				<p>
 					{user.name} is logged In.{' '}
 					<button
