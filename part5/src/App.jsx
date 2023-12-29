@@ -3,6 +3,7 @@ import Blog from './components/Blog';
 import blogService from './services/blogs';
 import login from './services/login';
 import Notification from './components/Notification';
+import Login from './components/Login';
 
 const App = () => {
 	const [blogs, setBlogs] = useState([]);
@@ -20,6 +21,7 @@ const App = () => {
 
 		if (userInfo) {
 			setUser(userInfo);
+			blogService.setToken(userInfo.token);
 		}
 	}, []);
 
@@ -42,11 +44,33 @@ const App = () => {
 		}
 	};
 
+	const addNewBlog = async (e) => {
+		e.preventDefault();
+
+		const payload = {
+			url,
+			author,
+			title,
+		};
+
+		try {
+			const response = await blogService.create(payload);
+
+			if (response) {
+				console.log(response);
+				setMessage('New blog added successfully');
+			}
+		} catch (error) {
+			console.error(error);
+			setMessage('ERROR: Failed to create new blog');
+		}
+	};
+
 	const newBlogForm = () => {
 		return (
 			<div>
 				<h2>create new blog</h2>
-				<form>
+				<form onSubmit={addNewBlog}>
 					<div>
 						title
 						<input
@@ -104,46 +128,7 @@ const App = () => {
 		);
 	};
 
-	const blogForm = () => {
-		return (
-			<div>
-				<h2>log in to application</h2>
-				<Notification message={message} />
-				<form
-					onSubmit={handleSubmit}
-					style={{
-						display: 'flex',
-						flexDirection: 'column',
-						width: '200px',
-					}}
-				>
-					<div>
-						username:
-						<input
-							name='username'
-							type='text'
-							placeholder='username'
-							value={username}
-							onChange={({ target }) => setUsername(target.value)}
-						/>
-					</div>
-					<div>
-						password:
-						<input
-							name='password'
-							type='password'
-							placeholder='password'
-							value={password}
-							onChange={({ target }) => setPassword(target.value)}
-						/>
-					</div>
-					<button type='submit'>Login</button>
-				</form>
-			</div>
-		);
-	};
-
-	return <div>{user ? blogList() : blogForm()}</div>;
+	return <div>{user ? blogList() : <Login />}</div>;
 };
 
 export default App;
