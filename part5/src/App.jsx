@@ -1,19 +1,19 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Blog from './components/Blog';
 import blogService from './services/blogs';
 import login from './services/login';
 import Notification from './components/Notification';
-import Login from './components/Login';
+import LoginForm from './components/Login';
+import Toggable from './components/Toggable';
+import BlogForm from './components/BlogForm';
 
 const App = () => {
 	const [blogs, setBlogs] = useState([]);
 	const [user, setUser] = useState(null);
-	const [username, setUsername] = useState('');
-	const [password, setPassword] = useState('');
+
 	const [message, setMessage] = useState(null);
-	const [title, setTitle] = useState('');
-	const [url, setUrl] = useState('');
-	const [author, setAuthor] = useState('');
+
+	const newBlogRef = useRef();
 
 	useEffect(() => {
 		blogService.getAll().then((blogs) => setBlogs(blogs));
@@ -25,8 +25,7 @@ const App = () => {
 		}
 	}, []);
 
-	const handleSubmit = async (e) => {
-		e.preventDefault();
+	const handleSubmit = async (username, password) => {
 		setMessage(null);
 
 		try {
@@ -44,9 +43,7 @@ const App = () => {
 		}
 	};
 
-	const addNewBlog = async (e) => {
-		e.preventDefault();
-
+	const addNewBlog = async (title, url, author) => {
 		const payload = {
 			url,
 			author,
@@ -66,69 +63,43 @@ const App = () => {
 		}
 	};
 
-	const newBlogForm = () => {
-		return (
-			<div>
-				<h2>create new blog</h2>
-				<form onSubmit={addNewBlog}>
-					<div>
-						title
-						<input
-							name='title'
-							type='text'
-							value={title}
-							onChange={({ target }) => setTitle(target.value)}
-						/>
-					</div>
-					<div>
-						author
-						<input
-							name='author'
-							type='text'
-							value={author}
-							onChange={({ target }) => setAuthor(target.value)}
-						/>
-						<div>
-							url
-							<input
-								name='url'
-								type='text'
-								value={url}
-								onChange={({ target }) => setUrl(target.value)}
-							/>
-						</div>
-					</div>
-					<button type='submit'>Submit</button>
-				</form>
-			</div>
-		);
+	const handleLogout = () => {
+		window.localStorage.removeItem('userInfo');
+		setUser(null);
 	};
 
-	const blogList = () => {
-		return (
-			<div>
-				<h2>blogs</h2>
-				{newBlogForm()}
-				<p>
-					{user.name} is logged In.{' '}
-					<button
-						onClick={() => {
-							localStorage.removeItem('userInfo');
-							setUser(null);
-						}}
-					>
-						logout
-					</button>
-				</p>
-				<Notification message={message} />
-				{blogs.map((blog) => (
-					<Blog key={blog.id} blog={blog} />
-				))}
-			</div>
-		);
-	};
-
-	return <div>{user ? blogList() : <Login />}</div>;
+	return (
+		<div>
+			<h2>blogs</h2>
+			<Notification message={message} />
+			{user === null ? (
+				<LoginForm handleSubmit={handleSubmit} />
+			) : (
+				<>
+					<p>
+						{user.name} logged in <button onClick={handleLogout}>Logout</button>
+					</p>
+					<Toggable buttonLabel='new blog' ref={newBlogRef}>
+						<h2>create new</h2>
+						<BlogForm addNewBlog={addNewBlog} />
+					</Toggable>
+					<hr></hr>
+					<div>
+						{blogs
+							.sort((a, b) => b.likes - a.likes)
+							.map((blog) => (
+								<Blog
+									key={blog.id}
+									blog={blog}
+									// updateBlog={updateBlog}
+									// deleteBlog={deleteBlog}
+								/>
+							))}
+					</div>
+				</>
+			)}
+		</div>
+	);
 };
 
 export default App;

@@ -1,20 +1,22 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Notification from './Notification';
 
-const Login = ({
-	message,
-	handleSubmit,
-	username,
-	setUsername,
-	password,
-	setPassword,
-}) => {
+const LoginForm = ({ handleSubmit }) => {
+	const [username, setUsername] = useState('');
+	const [password, setPassword] = useState('');
+
+	const onHandleLogin = (event) => {
+		event.preventDefault();
+		handleSubmit(username, password);
+		setUsername('');
+		setPassword('');
+	};
+
 	return (
 		<div>
 			<h2>log in to application</h2>
-			<Notification message={message} />
 			<form
-				onSubmit={handleSubmit}
+				onSubmit={onHandleLogin}
 				style={{
 					display: 'flex',
 					flexDirection: 'column',
@@ -47,4 +49,4 @@ const Login = ({
 	);
 };
 
-export default Login;
+export default LoginForm;
