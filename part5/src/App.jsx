@@ -68,6 +68,41 @@ const App = () => {
 		setUser(null);
 	};
 
+	const updateBlog = async (blog) => {
+		try {
+			await blogService.update(blog.id, {
+				title: blog.title,
+				author: blog.author,
+				url: blog.url,
+				likes: blog.likes,
+			});
+			setMessage(`new like to blog ${blog.title} by ${blog.author} added`);
+			const newBlogs = blogs.map((currentBlog) =>
+				currentBlog.id === blog.id
+					? { ...currentBlog, likes: currentBlog.likes + 1 }
+					: currentBlog
+			);
+			setBlogs(newBlogs);
+		} catch (error) {
+			setMessage(
+				`ERROR: a new like to blog ${blog.title} by ${blog.author} NOT added`
+			);
+		}
+	};
+
+	const deleteBlog = async (blog) => {
+		try {
+			await blogService.deleteBlog(blog.id);
+			setMessage(`blog ${blog.title} by ${blog.author} delete`);
+			const newBlogs = blogs.filter(
+				(currentBlog) => currentBlog.id !== blog.id
+			);
+			setBlogs(newBlogs);
+		} catch (error) {
+			setMessage(`ERROR: blog ${blog.title} by ${blog.author} NOT deleted`);
+		}
+	};
+
 	return (
 		<div>
 			<h2>blogs</h2>
@@ -91,8 +126,8 @@ const App = () => {
 								<Blog
 									key={blog.id}
 									blog={blog}
-									// updateBlog={updateBlog}
-									// deleteBlog={deleteBlog}
+									updateBlog={updateBlog}
+									deleteBlog={deleteBlog}
 								/>
 							))}
 					</div>
