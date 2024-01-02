@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import Notification from './Notification';
+import PropTypes from 'prop-types';
 
 const LoginForm = ({ handleSubmit }) => {
 	const [username, setUsername] = useState('');
@@ -50,3 +50,7 @@ const LoginForm = ({ handleSubmit }) => {
 };
 
 export default LoginForm;
+
+LoginForm.propTypes = {
+	handleSubmit: PropTypes.func.isRequired,
+};
