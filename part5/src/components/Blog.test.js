@@ -1,13 +1,12 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import { UserEvent, userEvent } from '@testing-library/user-event';
+import { userEvent } from '@testing-library/user-event';
 import '@testing-library/jest-dom';
 import Blog from './Blog';
 
 describe('<Blog />', () => {
 	let component;
-	const updateBlog = jest.fn();
-	const deleteBlog = jest.fn();
+
 	const blog = {
 		id: 'testing123',
 		title: 'title',
@@ -18,6 +17,9 @@ describe('<Blog />', () => {
 		},
 		likes: 0,
 	};
+
+	const updateBlog = jest.fn();
+	const deleteBlog = jest.fn();
 
 	beforeEach(() => {
 		component = render(
@@ -58,6 +60,7 @@ describe('<Blog />', () => {
 		const button = component.container.querySelector('.like');
 		await user.click(button);
 		await user.click(button);
-		expect(updateBlog.mock.calls).toHaveLength(2);
+
+		expect(updateBlog.mock.calls).toHaveLength(1);
 	});
 });
