@@ -56,5 +56,7 @@ describe('<Blog />', () => {
 		const button = component.container.querySelector('.like');
 		await user.click(button);
 		await user.click(button);
+
+		// expect(updateBlog.mock.calls).toHaveLength(2);
 	});
 });
