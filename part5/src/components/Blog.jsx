@@ -9,7 +9,8 @@ const Blog = ({ blog, updateBlog, deleteBlog }) => {
 		setVisible(!visible);
 	};
 
-	const addLike = () => {
+	const addLike = (e) => {
+		e.preventDefault();
 		updateBlog({
 			...blog,
 			likes: blog.likes + 1,

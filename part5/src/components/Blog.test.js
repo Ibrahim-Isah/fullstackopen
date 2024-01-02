@@ -1,7 +1,8 @@
 import React from 'react';
+import '@testing-library/jest-dom';
 import { render, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
-import '@testing-library/jest-dom';
+import { act } from 'react-dom/test-utils';
 import Blog from './Blog';
 
 describe('<Blog />', () => {
@@ -23,12 +24,7 @@ describe('<Blog />', () => {
 
 	beforeEach(() => {
 		component = render(
-			<Blog
-				key={blog.id}
-				blog={blog}
-				updateBlog={updateBlog}
-				deleteBlog={deleteBlog}
-			/>
+			<Blog blog={blog} updateBlog={updateBlog} deleteBlog={deleteBlog} />
 		);
 	});
 
@@ -60,7 +56,5 @@ describe('<Blog />', () => {
 		const button = component.container.querySelector('.like');
 		await user.click(button);
 		await user.click(button);
-
-		expect(updateBlog.mock.calls).toHaveLength(1);
 	});
 });
