@@ -57,6 +57,6 @@ describe('<Blog />', () => {
 		await user.click(button);
 		await user.click(button);
 
-		// expect(updateBlog.mock.calls).toHaveLength(2);
+		expect(updateBlog.mock.calls).toHaveLength(2);
 	});
 });
