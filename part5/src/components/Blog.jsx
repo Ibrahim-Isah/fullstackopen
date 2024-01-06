@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import blogService from '../services/blogs';
+import PropTypes from 'prop-types';
 
 const Blog = ({ blog, updateBlog, deleteBlog }) => {
 	const [visible, setVisible] = useState(false);
@@ -8,7 +9,8 @@ const Blog = ({ blog, updateBlog, deleteBlog }) => {
 		setVisible(!visible);
 	};
 
-	const addLike = () => {
+	const addLike = (e) => {
+		e.preventDefault();
 		updateBlog({
 			...blog,
 			likes: blog.likes + 1,
@@ -72,3 +74,8 @@ const Blog = ({ blog, updateBlog, deleteBlog }) => {
 };
 
 export default Blog;
+Blog.propTypes = {
+	blog: PropTypes.object.isRequired,
+	deleteBlog: PropTypes.func.isRequired,
+	updateBlog: PropTypes.func.isRequired,
+};
