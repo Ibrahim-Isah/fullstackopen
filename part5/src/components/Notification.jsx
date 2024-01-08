@@ -34,7 +34,7 @@ const Notification = ({ message }) => {
 					padding: '10px',
 					marginBottom: '10px',
 				}}
-				className='error'
+				className='success'
 			>
 				{message}
 			</div>

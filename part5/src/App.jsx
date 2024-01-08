@@ -54,8 +54,9 @@ const App = () => {
 			const response = await blogService.create(payload);
 
 			if (response) {
-				console.log(response);
 				setMessage('New blog added successfully');
+				const user = blogService.getUserInfo();
+				setBlogs(blogs.concat(response));
 			}
 		} catch (error) {
 			console.error(error);
@@ -114,12 +115,13 @@ const App = () => {
 					<p>
 						{user.name} logged in <button onClick={handleLogout}>Logout</button>
 					</p>
+
 					<Toggable buttonLabel='new blog' ref={newBlogRef}>
 						<h2>create new</h2>
 						<BlogForm addNewBlog={addNewBlog} />
 					</Toggable>
 					<hr></hr>
-					<div>
+					<div className='blog'>
 						{blogs
 							.sort((a, b) => b.likes - a.likes)
 							.map((blog) => (

@@ -16,6 +16,7 @@ const LoginForm = ({ handleSubmit }) => {
 		<div>
 			<h2>log in to application</h2>
 			<form
+				id='loginForm'
 				onSubmit={onHandleLogin}
 				style={{
 					display: 'flex',
@@ -27,6 +28,7 @@ const LoginForm = ({ handleSubmit }) => {
 					username:
 					<input
 						name='username'
+						id='username'
 						type='text'
 						placeholder='username'
 						value={username}
@@ -37,13 +39,16 @@ const LoginForm = ({ handleSubmit }) => {
 					password:
 					<input
 						name='password'
+						id='password'
 						type='password'
 						placeholder='password'
 						value={password}
 						onChange={({ target }) => setPassword(target.value)}
 					/>
 				</div>
-				<button type='submit'>Login</button>
+				<button type='submit' id='loginBtn'>
+					Login
+				</button>
 			</form>
 		</div>
 	);

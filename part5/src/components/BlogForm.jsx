@@ -14,7 +14,7 @@ const BlogForm = ({ addNewBlog }) => {
 		setUrl('');
 	};
 	return (
-		<div>
+		<div id='blogForm'>
 			<h2>create new blog</h2>
 
 			<form onSubmit={onHandleNewBlog}>
@@ -48,7 +48,9 @@ const BlogForm = ({ addNewBlog }) => {
 						/>
 					</div>
 				</div>
-				<button type='submit'>Submit</button>
+				<button type='submit' id='submit'>
+					Submit
+				</button>
 			</form>
 		</div>
 	);
