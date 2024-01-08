@@ -5,7 +5,7 @@ const SECRET = process.env.SECRET;
 let MONGODB_URI = process.env.MONGODB_LOCAL;
 const NODE_ENV = process.env.NODE_ENV;
 
-if (process.env.NODE_ENV === 'test') {
+if (process.env.NODE_ENV === 'tests') {
 	MONGODB_URI = process.env.TEST_MONGODB_URI;
 }
 
