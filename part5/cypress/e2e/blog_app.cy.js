@@ -167,6 +167,11 @@ describe('Blog app', function () {
 				const data = response.body;
 				expect(data).to.have.length(4);
 			});
+
+			cy.get('.blog').eq(0).should('contain', 'blog with 11 likes');
+			// cy.get('.blog').eq(1).should('contain', 'blog with 6 likes');
+			// cy.get('.blog').eq(2).should('contain', 'blog with 5 likes');
+			// cy.get('.blog').eq(3).should('contain', blogTest.title);
 		});
 	});
 });
