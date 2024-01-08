@@ -13,7 +13,6 @@ const getUserInfo = () => {
 };
 
 const create = async (data) => {
-	console.log('the token', token);
 	const response = await axios.post(baseUrl, data, {
 		headers: {
 			Authorization: token,

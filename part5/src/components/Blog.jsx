@@ -54,7 +54,7 @@ const Blog = ({ blog, updateBlog, deleteBlog }) => {
 							like
 						</button>
 					</p>
-					{allowRemove(blog.user.id) && (
+					{allowRemove(blog.user) && (
 						<button
 							className='remove'
 							style={{

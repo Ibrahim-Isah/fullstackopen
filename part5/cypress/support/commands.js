@@ -29,8 +29,7 @@ Cypress.Commands.add('register', ({ username, password, name }) => {
 		username,
 		password,
 		name,
-	}).then(({ body }) => {
-		// localStorage.setItem('userInfo', JSON.stringify(body));
+	}).then(() => {
 		cy.visit('http://localhost:5173');
 	});
 });
@@ -47,4 +46,19 @@ Cypress.Commands.add('newblog', ({ title, url, author }) => {
 	cy.get('#url').type(url);
 
 	cy.get('#submit').click();
+});
+
+Cypress.Commands.add('createBlog', (blogBody) => {
+	cy.request({
+		url: 'http://localhost:3001/api/blogs',
+		method: 'POST',
+		body: blogBody,
+		headers: {
+			Authorization: `Bearer ${
+				JSON.parse(localStorage.getItem('userInfo')).token
+			}`,
+		},
+	});
+
+	cy.visit('http://localhost:5173');
 });
