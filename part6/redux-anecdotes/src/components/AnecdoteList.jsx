@@ -7,14 +7,15 @@ const AnecdoteList = () => {
 	const dispatch = useDispatch();
 
 	const vote = (id) => {
+		console.log('tesing', id);
 		dispatch(addVote(id));
 	};
 
 	return (
 		<div>
 			{anecdotes
-				.sort((a, b) => b.votes - a.votes)
 				.filter((anecdote) => anecdote.content.includes(filter))
+				.sort((a, b) => b.votes - a.votes)
 				.map((anecdote) => (
 					<div key={anecdote.id}>
 						<div>{anecdote.content}</div>
