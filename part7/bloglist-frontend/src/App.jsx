@@ -19,6 +19,7 @@ import userService from './services/users';
 import login from './services/login';
 import UserList from './components/UserList';
 import { initUsers } from './features/usersSlice';
+import Header from './components/Header';
 
 const App = () => {
 	const dispatch = useDispatch();
@@ -75,11 +76,6 @@ const App = () => {
 			console.error(error);
 			dispatch(setNotification('ERROR: Failed to create new blog'));
 		}
-	};
-
-	const handleLogout = () => {
-		window.localStorage.removeItem('userInfo');
-		dispatch(logoutUser(null));
 	};
 
 	const updateBlog = async (blog) => {
@@ -141,7 +137,7 @@ const App = () => {
 						</div>
 					) : (
 						<div>
-							{/* <Header /> */}
+							<Header />
 							<h2>Bloglist</h2>
 							<Notification />
 							<h2>Users</h2>
@@ -161,10 +157,7 @@ const App = () => {
 						<LoginForm handleSubmit={handleSubmit} />
 					) : (
 						<>
-							<p>
-								{user.name} logged in{' '}
-								<button onClick={handleLogout}>Logout</button>
-							</p>
+							<Header />
 
 							<Toggable buttonLabel='new blog' ref={newBlogRef}>
 								<h2>create new</h2>

@@ -12,3 +12,10 @@ const authSlice = createSlice({
 
 export const { initUser, loginUser, logoutUser } = authSlice.actions;
 export default authSlice.reducer;
+
+export const logout = () => {
+	return async (dispatch) => {
+		window.localStorage.removeItem('userInfo');
+		dispatch(logoutUser(null));
+	};
+};
