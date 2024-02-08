@@ -8,12 +8,27 @@ const blogSlice = createSlice({
 			return action.payload;
 		},
 		addBlog: (state, action) => {
-			return state.push(action.payload);
+			return state.concat(action.payload);
+		},
+		removeBlog: (state, action) => {
+			return state.filter((blog) => blog.id !== action.payload);
+		},
+		addLike: (state, action) => {
+			return state.map((blog) => {
+				if (blog.id === action.payload) {
+					return {
+						...blog,
+						likes: blog.likes + 1,
+					};
+				}
+				return blog;
+			});
 		},
 	},
 });
 
-export const { initializeBlogs, addBlog } = blogSlice.actions;
+export const { initializeBlogs, addBlog, removeBlog, addLike } =
+	blogSlice.actions;
 export default blogSlice.reducer;
 
 export const setBlogs = (blogs) => {

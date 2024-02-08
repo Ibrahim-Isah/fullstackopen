@@ -1,30 +1,41 @@
-import { useState, useEffect, useRef } from 'react';
-import Blog from './components/Blog';
-import blogService from './services/blogs';
-import login from './services/login';
-import Notification from './components/Notification';
-import LoginForm from './components/Login';
-import Toggable from './components/Toggable';
-import BlogForm from './components/BlogForm';
+import { useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { RouterProvider, createBrowserRouter } from 'react-router-dom';
+import Blog from './components/Blog';
+import BlogForm from './components/BlogForm';
+import LoginForm from './components/Login';
+import Notification from './components/Notification';
+import Toggable from './components/Toggable';
+import { initUser, loginUser, logoutUser } from './features/authSlice';
+import {
+	addBlog,
+	addLike,
+	initializeBlogs,
+	removeBlog,
+} from './features/blogSlice';
 import { setNotification } from './features/notificationSlice';
-import { addBlog, initializeBlogs } from './features/blogSlice';
+import blogService from './services/blogs';
+import userService from './services/users';
+import login from './services/login';
+import UserList from './components/UserList';
+import { initUsers } from './features/usersSlice';
 
 const App = () => {
 	const dispatch = useDispatch();
 	const blogs = useSelector((state) => state.blogs);
-
-	const [user, setUser] = useState(null);
+	const user = useSelector((state) => state.auth);
+	const users = useSelector((state) => state.users);
 
 	const newBlogRef = useRef();
 
 	useEffect(() => {
 		blogService.getAll().then((blogs) => dispatch(initializeBlogs(blogs)));
+		userService.getAll().then((users) => dispatch(initUsers(users)));
 		const userInfo = JSON.parse(localStorage.getItem('userInfo'));
 
 		if (userInfo) {
-			setUser(userInfo);
 			blogService.setToken(userInfo.token);
+			dispatch(initUser(userInfo));
 		}
 	}, []);
 
@@ -37,7 +48,7 @@ const App = () => {
 				password: password,
 			});
 
-			setUser(response);
+			dispatch(loginUser(response));
 			localStorage.setItem('userInfo', JSON.stringify(response));
 			blogService.setToken(response.token);
 		} catch (error) {
@@ -58,7 +69,6 @@ const App = () => {
 
 			if (response) {
 				dispatch(setNotification('New blog added successfully'));
-				const user = blogService.getUserInfo();
 				dispatch(addBlog(response));
 			}
 		} catch (error) {
@@ -69,7 +79,7 @@ const App = () => {
 
 	const handleLogout = () => {
 		window.localStorage.removeItem('userInfo');
-		setUser(null);
+		dispatch(logoutUser(null));
 	};
 
 	const updateBlog = async (blog) => {
@@ -85,12 +95,8 @@ const App = () => {
 					`new like to blog ${blog.title} by ${blog.author} added`
 				)
 			);
-			const newBlogs = blogs.map((currentBlog) =>
-				currentBlog.id === blog.id
-					? { ...currentBlog, likes: currentBlog.likes + 1 }
-					: currentBlog
-			);
-			dispatch(initializeBlogs(newBlogs));
+
+			dispatch(addLike(blog.id));
 		} catch (error) {
 			dispatch(
 				setNotification(
@@ -103,11 +109,8 @@ const App = () => {
 	const deleteBlog = async (blog) => {
 		try {
 			await blogService.deleteBlog(blog.id);
+			dispatch(removeBlog(blog.id));
 			dispatch(setNotification(`blog ${blog.title} by ${blog.author} delete`));
-			const newBlogs = blogs.filter(
-				(currentBlog) => currentBlog.id !== blog.id
-			);
-			dispatch(initializeBlogs(newBlogs));
 		} catch (error) {
 			dispatch(
 				setNotification(
@@ -117,39 +120,77 @@ const App = () => {
 		}
 	};
 
-	return (
-		<div>
-			<h2>blogs</h2>
-			<Notification />
-			{user === null ? (
-				<LoginForm handleSubmit={handleSubmit} />
-			) : (
+	const router = createBrowserRouter([
+		{
+			path: '/',
+			element: (
 				<>
-					<p>
-						{user.name} logged in <button onClick={handleLogout}>Logout</button>
-					</p>
-
-					<Toggable buttonLabel='new blog' ref={newBlogRef}>
-						<h2>create new</h2>
-						<BlogForm addNewBlog={addNewBlog} />
-					</Toggable>
-					<hr></hr>
-					<div className='blog'>
-						{blogs
-							// .sort((a, b) => b.likes - a.likes)
-							.map((blog) => (
-								<Blog
-									key={blog.id}
-									blog={blog}
-									updateBlog={updateBlog}
-									deleteBlog={deleteBlog}
-								/>
-							))}
-					</div>
+					<Notification />
+					<LoginForm handleSubmit={handleSubmit} />
 				</>
-			)}
-		</div>
-	);
+			),
+		},
+		{
+			path: '/users',
+			element: (
+				<div>
+					{user === null ? (
+						<div>
+							<Notification />
+							<LoginForm />
+						</div>
+					) : (
+						<div>
+							{/* <Header /> */}
+							<h2>Bloglist</h2>
+							<Notification />
+							<h2>Users</h2>
+							<UserList />
+						</div>
+					)}
+				</div>
+			),
+		},
+		{
+			path: '/blogs/:id',
+			element: (
+				<div>
+					<h2>blogs</h2>
+					<Notification />
+					{user === null ? (
+						<LoginForm handleSubmit={handleSubmit} />
+					) : (
+						<>
+							<p>
+								{user.name} logged in{' '}
+								<button onClick={handleLogout}>Logout</button>
+							</p>
+
+							<Toggable buttonLabel='new blog' ref={newBlogRef}>
+								<h2>create new</h2>
+								<BlogForm addNewBlog={addNewBlog} />
+							</Toggable>
+							<hr></hr>
+							<div className='blog'>
+								{blogs
+									// .sort((a, b) => b.likes - a.likes)
+									.map((blog) => (
+										<Blog
+											key={blog.id}
+											blog={blog}
+											updateBlog={updateBlog}
+											deleteBlog={deleteBlog}
+										/>
+									))}
+							</div>
+						</>
+					)}
+				</div>
+			),
+		},
+	]);
+
+	return <RouterProvider router={router} />;
 };
 
 export default App;
