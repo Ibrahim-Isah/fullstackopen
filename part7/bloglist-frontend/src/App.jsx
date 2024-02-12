@@ -181,6 +181,40 @@ const App = () => {
 				</div>
 			),
 		},
+		{
+			path: '/blogs',
+			element: (
+				<div>
+					<h2>blogs</h2>
+					<Notification />
+					{user === null ? (
+						<LoginForm handleSubmit={handleSubmit} />
+					) : (
+						<>
+							<Header />
+
+							<Toggable buttonLabel='new blog' ref={newBlogRef}>
+								<h2>create new</h2>
+								<BlogForm addNewBlog={addNewBlog} />
+							</Toggable>
+							<hr></hr>
+							<div className='blog'>
+								{blogs
+									// .sort((a, b) => b.likes - a.likes)
+									.map((blog) => (
+										<Blog
+											key={blog.id}
+											blog={blog}
+											updateBlog={updateBlog}
+											deleteBlog={deleteBlog}
+										/>
+									))}
+							</div>
+						</>
+					)}
+				</div>
+			),
+		},
 	]);
 
 	return <RouterProvider router={router} />;
