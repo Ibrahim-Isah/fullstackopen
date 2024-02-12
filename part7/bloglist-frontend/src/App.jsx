@@ -1,12 +1,15 @@
 import { useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { RouterProvider, createBrowserRouter } from 'react-router-dom';
+import { Route, Routes, useMatch } from 'react-router-dom';
 import Blog from './components/Blog';
 import BlogForm from './components/BlogForm';
+import Header from './components/Header';
 import LoginForm from './components/Login';
 import Notification from './components/Notification';
 import Toggable from './components/Toggable';
-import { initUser, loginUser, logoutUser } from './features/authSlice';
+import UserBlog from './components/UserBlog';
+import UserList from './components/UserList';
+import { initUser, loginUser } from './features/authSlice';
 import {
 	addBlog,
 	addLike,
@@ -14,12 +17,11 @@ import {
 	removeBlog,
 } from './features/blogSlice';
 import { setNotification } from './features/notificationSlice';
-import blogService from './services/blogs';
-import userService from './services/users';
-import login from './services/login';
-import UserList from './components/UserList';
 import { initUsers } from './features/usersSlice';
-import Header from './components/Header';
+import blogService from './services/blogs';
+import login from './services/login';
+import userService from './services/users';
+import { Table } from 'react-bootstrap';
 
 const App = () => {
 	const dispatch = useDispatch();
@@ -116,108 +118,168 @@ const App = () => {
 		}
 	};
 
-	const router = createBrowserRouter([
-		{
-			path: '/',
-			element: (
-				<>
-					<Notification />
-					<LoginForm handleSubmit={handleSubmit} />
-				</>
-			),
-		},
-		{
-			path: '/users',
-			element: (
-				<div>
-					{user === null ? (
+	const matchUser = useMatch('/users/:id');
+	const singleUser = matchUser
+		? users.find((user) => user.id === matchUser.params.id)
+		: null;
+
+	const matchBlog = useMatch('/blogs/:id');
+	const singleBlog = matchBlog
+		? blogs.find((blog) => blog.id === blogMatch.params.id)
+		: null;
+
+	return (
+		<div className='container'>
+			<Routes>
+				<Route
+					path='/users/:id'
+					element={
+						<>
+							{user === null ? (
+								<div>
+									<Notification />
+									<LoginForm />
+								</div>
+							) : (
+								<div>
+									<Header />
+									<h2>Bloglist</h2>
+									<Notification />
+									<h3>{user.name}</h3>
+									<h4>Added blogs</h4>
+									{!singleUser ? null : (
+										<ul>
+											{singleUser.blogs.map((blog) => (
+												<UserBlog key={blog.id} blog={blog} />
+											))}
+										</ul>
+									)}
+								</div>
+							)}
+						</>
+					}
+				/>
+				<Route
+					path='/blogs/:id'
+					element={
+						<>
+							{user === null ? (
+								<div>
+									<Notification />
+									<LoginForm />
+								</div>
+							) : (
+								<div>
+									<Header />
+									<h2>Bloglist</h2>
+									<Notification />
+									{!singleBlog ? null : (
+										<div>
+											<h2>{singleBlog.title}</h2>
+											<p>{singleBlog.url}</p>
+											<p>
+												{singleBlog.likes} likes{' '}
+												<Button
+													variant='primary'
+													onClick={() => handleLikes(singleBlog)}
+												>
+													like
+												</Button>
+											</p>
+											<p>added by {singleBlog.author}</p>
+											<h3>comments</h3>
+											<form onSubmit={handleComment}>
+												<div>
+													<input id='comment' type='text' name='comment' />
+													<Button
+														style={margin}
+														variant='primary'
+														id='comment-button'
+														type='submit'
+													>
+														add comment
+													</Button>
+												</div>
+											</form>
+											<ul>
+												{singleBlog.comments.map((comment) => (
+													<li key={comment}>{comment}</li>
+												))}
+											</ul>
+										</div>
+									)}
+								</div>
+							)}
+						</>
+					}
+				/>
+				<Route
+					path='/blogs'
+					element={
 						<div>
+							<h2>blogs</h2>
+							<Notification />
+							{user === null ? (
+								<LoginForm handleSubmit={handleSubmit} />
+							) : (
+								<>
+									<Header />
+
+									<Toggable buttonLabel='new blog' ref={newBlogRef}>
+										<h2>create new</h2>
+										<BlogForm addNewBlog={addNewBlog} />
+									</Toggable>
+									<hr></hr>
+									<div className='blog'>
+										{blogs
+											// .sort((a, b) => b.likes - a.likes)
+											.map((blog) => (
+												<Blog
+													key={blog.id}
+													blog={blog}
+													updateBlog={updateBlog}
+													deleteBlog={deleteBlog}
+												/>
+											))}
+									</div>
+								</>
+							)}
+						</div>
+					}
+				/>
+				<Route
+					path='/users'
+					element={
+						<>
+							{user === null ? (
+								<div>
+									<Notification />
+									<LoginForm />
+								</div>
+							) : (
+								<div>
+									<Header />
+									<h2>Bloglist</h2>
+									<Notification />
+									<h2>Users</h2>
+									<UserList />
+								</div>
+							)}
+						</>
+					}
+				/>
+				<Route
+					path='/'
+					element={
+						<>
 							<Notification />
 							<LoginForm />
-						</div>
-					) : (
-						<div>
-							<Header />
-							<h2>Bloglist</h2>
-							<Notification />
-							<h2>Users</h2>
-							<UserList />
-						</div>
-					)}
-				</div>
-			),
-		},
-		{
-			path: '/blogs/:id',
-			element: (
-				<div>
-					<h2>blogs</h2>
-					<Notification />
-					{user === null ? (
-						<LoginForm handleSubmit={handleSubmit} />
-					) : (
-						<>
-							<Header />
-
-							<Toggable buttonLabel='new blog' ref={newBlogRef}>
-								<h2>create new</h2>
-								<BlogForm addNewBlog={addNewBlog} />
-							</Toggable>
-							<hr></hr>
-							<div className='blog'>
-								{blogs
-									// .sort((a, b) => b.likes - a.likes)
-									.map((blog) => (
-										<Blog
-											key={blog.id}
-											blog={blog}
-											updateBlog={updateBlog}
-											deleteBlog={deleteBlog}
-										/>
-									))}
-							</div>
 						</>
-					)}
-				</div>
-			),
-		},
-		{
-			path: '/blogs',
-			element: (
-				<div>
-					<h2>blogs</h2>
-					<Notification />
-					{user === null ? (
-						<LoginForm handleSubmit={handleSubmit} />
-					) : (
-						<>
-							<Header />
-
-							<Toggable buttonLabel='new blog' ref={newBlogRef}>
-								<h2>create new</h2>
-								<BlogForm addNewBlog={addNewBlog} />
-							</Toggable>
-							<hr></hr>
-							<div className='blog'>
-								{blogs
-									// .sort((a, b) => b.likes - a.likes)
-									.map((blog) => (
-										<Blog
-											key={blog.id}
-											blog={blog}
-											updateBlog={updateBlog}
-											deleteBlog={deleteBlog}
-										/>
-									))}
-							</div>
-						</>
-					)}
-				</div>
-			),
-		},
-	]);
-
-	return <RouterProvider router={router} />;
+					}
+				/>
+			</Routes>
+		</div>
+	);
 };
 
 export default App;
