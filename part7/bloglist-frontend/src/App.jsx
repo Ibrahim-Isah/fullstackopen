@@ -12,6 +12,7 @@ import UserList from './components/UserList';
 import { initUser, loginUser } from './features/authSlice';
 import {
 	addBlog,
+	addComment,
 	addLike,
 	initializeBlogs,
 	removeBlog,
@@ -21,7 +22,7 @@ import { initUsers } from './features/usersSlice';
 import blogService from './services/blogs';
 import login from './services/login';
 import userService from './services/users';
-import { Table } from 'react-bootstrap';
+import { Button, Table } from 'react-bootstrap';
 
 const App = () => {
 	const dispatch = useDispatch();
@@ -80,13 +81,13 @@ const App = () => {
 		}
 	};
 
-	const updateBlog = async (blog) => {
+	const handleLike = async (blog) => {
 		try {
 			await blogService.update(blog.id, {
 				title: blog.title,
 				author: blog.author,
 				url: blog.url,
-				likes: blog.likes,
+				likes: blog.likes + 1,
 			});
 			dispatch(
 				setNotification(
@@ -125,8 +126,42 @@ const App = () => {
 
 	const matchBlog = useMatch('/blogs/:id');
 	const singleBlog = matchBlog
-		? blogs.find((blog) => blog.id === blogMatch.params.id)
+		? blogs.find((blog) => blog.id === matchBlog.params.id)
 		: null;
+
+	const handleComment = async (event, blog) => {
+		event.preventDefault();
+
+		try {
+			const commentToAdd = event.target.comment.value;
+			event.target.comment.value = '';
+			await blogService.update(blog.id, {
+				title: blog.title,
+				author: blog.author,
+				url: blog.url,
+				likes: blog.likes,
+				comments: blog.comments.concat(commentToAdd),
+			});
+			dispatch(
+				setNotification(
+					`a new comment to blog ${blog.title} by ${blog.author} added`
+				)
+			);
+
+			dispatch(
+				addComment({
+					id: blog.id,
+					comment: commentToAdd,
+				})
+			);
+		} catch (error) {
+			dispatch(
+				setNotification(
+					`ERROR: a new comment to blog ${blog.title} by ${blog.author} NOT added`
+				)
+			);
+		}
+	};
 
 	return (
 		<div className='container'>
@@ -181,18 +216,20 @@ const App = () => {
 												{singleBlog.likes} likes{' '}
 												<Button
 													variant='primary'
-													onClick={() => handleLikes(singleBlog)}
+													onClick={() => handleLike(singleBlog)}
 												>
 													like
 												</Button>
 											</p>
 											<p>added by {singleBlog.author}</p>
 											<h3>comments</h3>
-											<form onSubmit={handleComment}>
+											<form onSubmit={(e) => handleComment(e, singleBlog)}>
 												<div>
 													<input id='comment' type='text' name='comment' />
 													<Button
-														style={margin}
+														style={{
+															margin: 5,
+														}}
 														variant='primary'
 														id='comment-button'
 														type='submit'
@@ -202,7 +239,7 @@ const App = () => {
 												</div>
 											</form>
 											<ul>
-												{singleBlog.comments.map((comment) => (
+												{singleBlog?.comments?.map((comment) => (
 													<li key={comment}>{comment}</li>
 												))}
 											</ul>
@@ -237,7 +274,7 @@ const App = () => {
 												<Blog
 													key={blog.id}
 													blog={blog}
-													updateBlog={updateBlog}
+													updateBlog={handleLike}
 													deleteBlog={deleteBlog}
 												/>
 											))}

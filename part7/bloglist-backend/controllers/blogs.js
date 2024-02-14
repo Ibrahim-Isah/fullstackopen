@@ -26,14 +26,17 @@ blogsRouter.get('/:id', async (request, response) => {
 blogsRouter.post('/', async (request, response) => {
 	const user = await User.findById(request.user);
 
+	if (!request.body.likes) {
+		request.body.likes = 0;
+	}
+	if (!request.body.comments) {
+		request.body.comments = [];
+	}
+
 	const blog = new Blog({
 		...request.body,
 		user: user._id,
 	});
-
-	if (!blog.likes) {
-		blog.likes = 0;
-	}
 
 	if (!blog.url || !blog.title) {
 		return response.status(400).json({ error: 'title or url missing' });
@@ -57,6 +60,10 @@ blogsRouter.put('/:id', async (request, response) => {
 		return response.status(404).json({
 			error: 'Blog does not exists',
 		});
+	}
+
+	if (!updatedBlog.comments) {
+		updatedBlog.comments = [];
 	}
 
 	const updated = await Blog.findByIdAndUpdate(request.params.id, updatedBlog, {

@@ -37,13 +37,9 @@ const Blog = ({ blog, updateBlog, deleteBlog }) => {
 	return (
 		<div style={blogStyle}>
 			<div>
-				<p className='title'>
+				<a href={`/blogs/${blog.id}`} className='title'>
 					{blog.title}{' '}
-					<button className='show-more' onClick={toggleVisibility}>
-						view
-					</button>
-				</p>
-				<p className='author'>{blog.author}</p>
+				</a>
 			</div>
 			{visible && (
 				<div className='extra-info'>

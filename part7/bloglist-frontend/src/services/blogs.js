@@ -29,6 +29,7 @@ const getAll = () => {
 
 const update = (id, newObject) => {
 	const user = getUserInfo();
+
 	const request = axios.put(`${baseUrl}/${id}`, {
 		...newObject,
 		user: user.id,
