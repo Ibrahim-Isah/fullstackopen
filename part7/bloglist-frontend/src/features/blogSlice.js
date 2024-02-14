@@ -24,10 +24,21 @@ const blogSlice = createSlice({
 				return blog;
 			});
 		},
+		addComment: (state, action) => {
+			return state.map((blog) => {
+				if (blog.id === action.payload.id) {
+					return {
+						...blog,
+						comments: blog.comments.concat(action.payload.comment),
+					};
+				}
+				return blog;
+			});
+		},
 	},
 });
 
-export const { initializeBlogs, addBlog, removeBlog, addLike } =
+export const { initializeBlogs, addBlog, removeBlog, addLike, addComment } =
 	blogSlice.actions;
 export default blogSlice.reducer;
 
